@@ -48,14 +48,26 @@ morseCodes mcodes[] = //2D array to define all morse code to english translation
      {"--..", 'Z'},
      {"/", ' '},
      {"\r", '\r'},
-     {"\n", '\n'}};
+     {"\n", '\n'},
+     {"|", '|'}
+     };
 
-morseCodes symbols_list[] =
+morseCodes symbols_list[] = //list of special characters for extra credit.
 {
+  {"-----", '0'},
+  {".----", '1'}, 
+  {"..---", '2'}, 
+  {"...--", '3'},
+  {"....-", '4'}, 
+  {".....", '5'}, 
+  {"-....", '6'}, 
+  {"--...", '7'}, 
+  {"---..", '8'}, 
+  {"----.", '9'}, 
   {".-.-.-", '.'},
   {"--..--", ','}, 
   {"..--..", '?'},
-  //{".----.", ' '},
+  {".----.", '\''},
   {"-.-.--", '!'},
   {"-..-.", '/'},
   {"-.--.", '('}, 
@@ -69,83 +81,17 @@ morseCodes symbols_list[] =
   {"..--.-", '_'},
   {".-..-.", '"'},
   {"...-..-", '$'},
-  {".--.-.", '@'},
+  {".--.-.", '@'}
   //{"..-.-", '¿'},
-  //{"--...-", '¡'},
-};
+  //{"--...-", '¡'}
+  };
 
 const char *englishToMorse(char eng)
 {
   char const *error = "eeee"; //error message is the default
-  switch (tolower(eng)) //huge switch statement to manage translations from english to morse code
-  {
-  case 'a':
-    return ".-";
-  case 'b':
-    return "-...";
-  case 'c':
-    return "-.-.";
-  case 'd':
-    return "-..";
-  case 'e':
-    return ".";
-  case 'f':
-    return "..-.";
-  case 'g':
-    return "--.";
-  case 'h':
-    return "....";
-  case 'i':
-    return "..";
-  case 'j':
-    return ".---";
-  case 'k':
-    return "-.-";
-  case 'l':
-    return ".-..";
-  case 'm':
-    return "--";
-  case 'n':
-    return "-.";
-  case 'o':
-    return "---";
-  case 'p':
-    return ".--.";
-  case 'q':
-    return "--.-";
-  case 'r':
-    return ".-.";
-  case 's':
-    return "...";
-  case 't':
-    return "-";
-  case 'u':
-    return "..-";
-  case 'v':
-    return "...-";
-  case 'w':
-    return ".--";
-  case 'x':
-    return "-..-";
-  case 'y':
-    return "-.--";
-  case 'z':
-    return "--..";
-  case ' ':
-    return "/";
-  case '|':
-    return "|";
-  case '\n':
-    return "\n";
-  case '\r':
-    return "\r";
-  default:
-    return error;
-    break;
-  }
 
   if(symbols = 1){
-    for (int i = 0; i < sizeof(symbols_list); i++) //refers back to mcodes to iterate thorugh the array
+    for (int i = 0; i < 27; i++) //refers back to mcodes to iterate thorugh the array
     {
       if (eng == symbols_list[i].letter) //checks to see if given const char* is in the array
       {
@@ -154,25 +100,33 @@ const char *englishToMorse(char eng)
     }
 
   }
-  // return error; //error output
+
+  //std::cout << "Input" << eng << std::endl;
+
+  for (int i = 0; i < 30; i++) //refers back to mcodes to iterate thorugh the array
+  {
+    if (toupper(eng) == mcodes[i].letter) //checks to see if given const char* is in the array
+    {
+      return mcodes[i].code; //then returns the letter translation
+    }
+  }
+
+  return error;
+
 }
 
 char morseToEnglish(const char *morseIn) //morse to english translator function instead of a big switch statement I use strcmp through a 2D array
 {
-  std::cout << "Entering for loop" << std::endl;
-  std::cout <<"Morse In " << morseIn << std::endl;
-  for (int i = 0; i < 29; i++) //refers back to mcodes to iterate thorugh the array
+  for (int i = 0; i < 30; i++) //refers back to mcodes to iterate thorugh the array
   {
     if (strcmp(morseIn, mcodes[i].code) == 0) //checks to see if given const char* is in the array
     {
       return mcodes[i].letter; //then returns the letter translation
     }
   }
-  std::cout << "Exiting for loop" << std::endl;
 
   if(symbols == 1){ //if the user turns on symbols
-    std::cout << "Symbols are turned on, testing morse code... " << std::endl;
-    for (int i = 0; i < sizeof(symbols_list); i++) //uses the symbols list to translate the number or special character
+    for (int i = 0; i < 27; i++) //uses the symbols list to translate the number or special character
     {
       if (strcmp(morseIn, symbols_list[i].code) == 0) //checks to see if given const char* is in the array
       {
@@ -193,14 +147,16 @@ void engReadFile(const char *inputfile, const char *outputfile, int verbose) // 
   infile.open(inputfile, ios::in);
   outfile.open(outputfile, ios::out);
 
+  std::cout << "Translating " << inputfile << " to morse code" << std::endl;
+
   while (infile.getline(cars, 255)) // while loop to iterate through all lines in the file
   {
     char *word; // tokenize each line into words seperated by a space
 
     
-    if (verbose == 1)
-    { // shows progress if in verbose mode
+    if(verbose == 1){
       std::cout << "READ:: " << cars << std::endl;
+      std::cout << "WROTE:: ";
     }
     
 
@@ -222,61 +178,85 @@ void engReadFile(const char *inputfile, const char *outputfile, int verbose) // 
         {
           d[i] = ' ';
         }
-        std::cout << "Letter: " << d[i] << " Conversion: " << englishToMorse(d[i]) <<std::endl;
-        strcat(morseLine, ((char *)englishToMorse(d[i])));
-        strcat(morseLine, ((char *)englishToMorse('|')));
+        //std::cout << "Letter: " << d[i] << " Conversion: " << englishToMorse(d[i]) <<std::endl;
+        if (verbose == 1)
+        {
+          std::cout << englishToMorse(d[i]) << englishToMorse('|');
+        }
 
         outfile << englishToMorse(d[i]); // calls the englishToMorse translator function to write the character to the output file
         outfile << englishToMorse('|');  // add the '|' delimeter at the end of each morse code character
       }
 
+        outfile << englishToMorse(' '); //adds the space in between words
+        outfile << englishToMorse('|');
+
+        if(verbose == 1){
+          std::cout << englishToMorse(' ');
+          std::cout << englishToMorse('|');
+        }
+
       word = strtok(NULL, " "); // tokenize the word again until we only get letters
     }
 
-    if (verbose == 1)
-    {
-      std::cout << "WROTE:: " << morseLine << std::endl;
+    if(verbose == 1){
+      std::cout << std::endl; //an endline for the verbose funciton
     }
 
     morseLine[0] = 0;
 
   }
+  std::cout << outputfile << " file completed." << std::endl;
+
   infile.close(); // close files
   outfile.close();
 }
 
-void morseReadFile(const char *inputfile, const char *outputfile, int verbose) //verbose parameter added for extra credit
+void morseReadFile(const char *inputfile, const char *outputfile, int verbose) //reads a morse code file and converts it into english.
 {
   ifstream morseIn; //define our input and output files
   ofstream transEng;
   morseIn.open(inputfile, ios::in);
   transEng.open(outputfile, ios::out);
 
-  char text[255]; //define text that we are reading from the file. 
+  char text[255]; //define text that we are reading from the file.
+
+  std::cout << "Translating " << inputfile << " to English" << std::endl; 
 
   while (morseIn.getline(text, 255, '\n')) //read loop for the file
   {
     const char *letter;
-    letter = strtok(text, "|");
-    // std::cout << letter;
-    // std::cout << "here in the while loop";
-    while (letter != NULL)
+
+    if(verbose == 1){ //verbose read and write
+      std::cout << "READ:: " << text << std::endl;
+      std::cout << "WROTE:: ";
+    }
+
+
+    letter = strtok(text, "|"); //tokenize the string into letters
+    while (letter != NULL) //loops until the letter string is empty
     {
-      std::cout << "This is the letter: " << letter << std::endl;
       if (strcmp("\r", letter) == 0 || strcmp("\n", letter) == 0) //output a space since we are not getting it from return characters or newline for some reason.
       {
-        transEng << morseToEnglish("/");
-        std::cout << "The letter is an end line " << letter << std::endl;
+        transEng << morseToEnglish("/"); 
       }
-      std::cout << "Entering morse to english" << std::endl;
+
       transEng << morseToEnglish(letter); //output our translation into the output file.
-      std::cout << "Exiting morse to english" << std::endl;
-      // transEng << d;
-      std::cout << "This is the morse translation: " << morseToEnglish(letter) << std::endl;
+      
+      if(verbose == 1){
+        std::cout << morseToEnglish(letter); //outputs the line if in verbose mode
+      }
 
       letter = strtok(NULL, "|"); //tokenize the letter by '|' so we can iterate through the next one. 
     }
+    if(verbose == 1){
+      std::cout << std::endl;
+    }
+
   }
+
+  std::cout << outputfile << " file completed." << std::endl;
+
   morseIn.close();
   transEng.close();
 }
@@ -289,8 +269,6 @@ int main(int argc, char *argv[]) // use argc and argv parameters to get variable
   char *cmd;
   char *progress;
 
-  std::cout << "hi " << std::endl;
-
   if (argc < 4)
   { // if too little parameters are given: return an error message
     std::cout << "Error -- usage: <exe> <input file> <-mc|-e> <output file";
@@ -300,29 +278,23 @@ int main(int argc, char *argv[]) // use argc and argv parameters to get variable
     inputfile = argv[1]; //assign all variables from the command line
     cmd = argv[2];
     outputfile = argv[3];
-    progress = argv[4];
-    int v = 0;
-    std::cout << "1" << std::endl;
-
-    /*
-    if (strcmp("-v", progress) == 0)
-    { // checks if the user wants to go into verbose mode (extra credit)
-      std::cout << "2" << std::endl;
-      v = 1;
-    }
     
+    int v = 0;
 
-      std::cout << "3" << std::endl;
+    if (argc  == 5){
+      progress = argv[4];
+      if (strcmp("-v", progress) == 0)
+      { // checks if the user wants to go into verbose mode (extra credit)
+        v = 1; 
+      }
+    }
 
-
-    if(strcmp("-mcx", cmd) == 0 || strcmp("-ex", cmd) == 0){
-      std::cout << "The if statement is running" << std::endl;
+    if(strcmp("-mcx", cmd) == 0 || strcmp("-ex", cmd) == 0){ //checks if user wants to use special characters
       symbols = 1;
     } else {
-      std::cout << "The if statement is rnot unning" << std::endl;
       symbols = 0;
     }
-    */
+  
 
     if (strcmp("-mc", cmd) == 0 || strcmp("-mcx", cmd) == 0)
     {                                        // strcmp to check if user wants a file in Morse Code.
@@ -330,7 +302,6 @@ int main(int argc, char *argv[]) // use argc and argv parameters to get variable
     }
     else if (strcmp("-e", cmd) == 0 || strcmp("-ex", cmd) == 0)
     {                                          // check if the command if for eng
-      std::cout << "Translating Morse into English " << std::endl;
       morseReadFile(inputfile, outputfile, v); // translates to English
     }
 
